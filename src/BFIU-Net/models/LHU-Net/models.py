@@ -17,7 +17,7 @@ BOTTLENECK_BLOCKS = 2
 BOTTLENECK_PLANES = 64
 BOTTLENECK_EXPANSION = 4
 DEFAULT_STAGE_MODULES = (1,)
-MODEL_ID = "hrnet_r5_lowtohigh_e1start_e0skip_c32_64_128_bneck2_nobn_v1"
+MODEL_ID = "hrnet_r5_lowtohigh_e1start_e0skip_c32_64_128_bneck2_tconvalign_nobn_v2"
 
 
 def _local_module(name):
@@ -103,8 +103,8 @@ def build_unet3d(input_shape=INPUT_SHAPE, *, stage_modules=DEFAULT_STAGE_MODULES
         )
 
 
-    aligned_h2 = layers.UpSampling3D(size=(2, 2, 2), data_format="channels_last",
-                                      name="align_h2_nearest")(branches[1])
+    aligned_h2 = _blocks.conv_transpose3d(
+        branches[1], HR_BRANCH_CHANNELS[1], name="align_h2_deconv")
     aggregated = layers.Concatenate(axis=-1, name="encoder_multiscale_concat")(
         [branches[0], aligned_h2])
 

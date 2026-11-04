@@ -7,7 +7,7 @@ import re
 import tempfile
 
 
-MODEL_ID = "hrnet_r5_lowtohigh_e1start_e0skip_c32_64_128_bneck2_nobn_v1"
+MODEL_ID = "hrnet_r5_lowtohigh_e1start_e0skip_c32_64_128_bneck2_tconvalign_nobn_v2"
 CONTRACT_SCHEMA_VERSION = 4
 CONTRACT_DATASET = "__hrnet_architecture_contract__"
 SOURCE_DATASET = "__hrnet_source_manifest__"
