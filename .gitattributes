@@ -1,0 +1,2 @@
+* text=auto eol=lf
+src/BFIU-Net/models/*/*.py -text
