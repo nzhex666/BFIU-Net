@@ -8,7 +8,8 @@ def transform_edge(source, source_index, target_index, channels, *, name):
     if source_index == target_index:
         return source
     if source_index > target_index:
-        x = source
+        x = conv3d(source, channels[target_index], kernel_size=1,
+                   name=name + "_project")
         for step in range(1, source_index - target_index + 1):
             x = conv_transpose3d(x, channels[target_index],
                                  name=name + "_up{}_deconv".format(step))

@@ -16,7 +16,7 @@ BOTTLENECK_BLOCKS = 2
 BOTTLENECK_PLANES = 64
 BOTTLENECK_EXPANSION = 4
 DEFAULT_STAGE_MODULES = (1,)
-MODEL_ID = "bfiu_net_e1start_e0skip_c32_64_128_bneck2_directtconv_nobn_v3"
+MODEL_ID = "bfiu_net_e1start_e0skip_c32_64_128_bneck2_tconvalign_nobn_v2"
 
 
 def _local_module(name):
