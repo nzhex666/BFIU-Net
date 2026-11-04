@@ -7,7 +7,7 @@ import re
 import tempfile
 
 
-MODEL_ID = "c0_plain_unet_3scale_c32_64_128_stride2_nearest_transpose_nobn_relu_v1"
+MODEL_ID = "c0_plain_unet_3scale_c32_64_128_maxpool_nearest_nobn_relu_v2"
 CONTRACT_SCHEMA_VERSION = 4
 CONTRACT_DATASET = "__unet_architecture_contract__"
 SOURCE_DATASET = "__unet_source_manifest__"
@@ -111,7 +111,7 @@ def get_architecture_contract(model):
     downsampling_layers = [{"name": entry["name"], "class_name": entry["class_name"],
                             "sources": _edge_names(entry), "config": entry["config"]}
                            for entry in graph_layers
-                           if entry["class_name"] == "Conv3D" and
+                           if entry["class_name"] in ("Conv3D", "MaxPooling3D", "AveragePooling3D") and
                            any(stride > 1 for stride in entry["config"]["strides"])]
     head = by_name.get("head", {})
     residual_adds = [entry["name"] for entry in graph_layers if entry["class_name"] == "Add"]

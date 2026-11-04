@@ -10,7 +10,7 @@ from tensorflow.keras import Model, layers
 
 INPUT_SHAPE = (128, 128, 128, 1)
 BRANCH_CHANNELS = (32, 64, 128)
-MODEL_ID = "c0_plain_unet_3scale_c32_64_128_stride2_nearest_transpose_nobn_relu_v1"
+MODEL_ID = "c0_plain_unet_3scale_c32_64_128_maxpool_nearest_nobn_relu_v2"
 
 
 def _local_module(name):
@@ -58,18 +58,17 @@ def build_unet3d(input_shape=INPUT_SHAPE, *, pretrained_weights=None):
     x = e0
     for level, channels in enumerate(BRANCH_CHANNELS[1:], start=1):
         prefix = "encoder{}".format(level)
-        x = _blocks.conv3d(x, channels, strides=2, name=prefix + "_conv1")
-        x = layers.ReLU(name=prefix + "_relu1")(x)
-        x = _blocks.conv3d(x, channels, strides=1, name=prefix + "_conv2")
-        x = layers.ReLU(name=prefix + "_relu2")(x)
+        x = layers.MaxPooling3D(
+            pool_size=2, strides=2, padding="valid", data_format="channels_last",
+            name=prefix + "_pool"
+        )(x)
+        x = _blocks.double_conv(x, channels, name=prefix)
         features.append(x)
     e1, e2 = features[1:]
 
     x = _fusion.nearest_skip_concat(e2, e1, name="decoder1")
     x = _blocks.double_conv(x, BRANCH_CHANNELS[1], name="decoder1")
-    x = _blocks.conv_transpose3d(x, BRANCH_CHANNELS[0], name="decoder0_deconv")
-    x = layers.ReLU(name="decoder0_relu")(x)
-    x = _fusion.same_scale_concat(x, e0, name="decoder0_concat")
+    x = _fusion.nearest_skip_concat(x, e0, name="decoder0")
     x = _blocks.double_conv(x, BRANCH_CHANNELS[0], name="decoder0")
     outputs = _blocks.conv3d(x, 1, kernel_size=3, name="head",
                              dtype="float32", activation="sigmoid")
